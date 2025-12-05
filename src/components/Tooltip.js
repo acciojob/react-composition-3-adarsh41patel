@@ -3,18 +3,23 @@ import React, { useState } from "react";
 export default function Tooltip({ text, children }) {
   const [show, setShow] = useState(false);
 
-  // Clone the child element and inject tooltip + className
-  return React.cloneElement(children, {
-    className: "tooltip",
-    onMouseEnter: () => setShow(true),
-    onMouseLeave: () => setShow(false),
-    children: (
-      <>
-        {children.props.children}
-        {show && (
-          <div className="tooltiptext">{text}</div>
-        )}
-      </>
-    )
-  });
+  // ensure children are preserved
+  const child = React.Children.only(children);
+
+  const mergedClassName = child.props.className
+    ? child.props.className + " tooltip"
+    : "tooltip";
+
+  return React.cloneElement(
+    child,
+    {
+      className: mergedClassName,
+      onMouseEnter: () => setShow(true),
+      onMouseLeave: () => setShow(false),
+    },
+    <>
+      {child.props.children}   {/* ORIGINAL text stays */}
+      {show && <div className="tooltiptext">{text}</div>} 
+    </>
+  );
 }
